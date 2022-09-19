@@ -1,80 +1,71 @@
-const gulp = require('gulp');
+const gulp        = require('gulp');
 const browserSync = require('browser-sync');
 const sass = require('gulp-sass')(require('sass'));
 const cleanCSS = require('gulp-clean-css');
 const autoprefixer = require('gulp-autoprefixer');
-const rename = require('gulp-rename');
+const rename = require("gulp-rename");
 const imagemin = require('gulp-imagemin');
 const htmlmin = require('gulp-htmlmin');
 
+gulp.task('server', function() {
 
-// Static server
-// gulp.task('server', function () {   // Запускаем локальный сервер
-//   browserSync.init({
-//     server: {
-//       baseDir: "src"  // Папка, которую будет подхватывать gulp
-//     }
-//   });
-// });
+    browserSync({
+        server: {
+            baseDir: "dist"
+        }
+    });
 
-gulp.task('server', function () {   // Запускаем локальный сервер
-
-  browserSync({
-    server: {
-      baseDir: "dist"  // Папка, которую будет подхватывать gulp
-    }
-  });
-
-  gulp.watch("src/*+.html").on('change', browserSync.reload);
+    gulp.watch("src/*.html").on('change', browserSync.reload);
 });
 
-gulp.task('styles', function () {
-  return gulp.src("src/sass/**/*.+(scss|sass)")  // берём любой файл с расширением cscc или sasss
-    .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))  // А тут мы его уже компилируем+сжимает и в случае ошибки, подскажет, где она
-    .pipe(rename({suffix: ".min", prefix: ""})) // Используем плагин rename
-    .pipe(autoprefixer())  // Используем плагин autoprefixer
-    .pipe(cleanCSS({compatibility: 'ie8'}))   // Используем плагин cleanCSS
-    // .pipe(gulp.dest('src/css'))  // После этого мы кладём файл по пути src/css
-    .pipe(gulp.dest('dist/css'))  // После этого мы кладём файл по пути src/css
-    .pipe(browserSync.stream());  // После изменений, обновляем страницу командой
+gulp.task('styles', function() {
+    return gulp.src("src/sass/**/*.+(scss|sass)")
+        .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+        .pipe(rename({suffix: '.min', prefix: ''}))
+        .pipe(autoprefixer())
+        .pipe(cleanCSS({compatibility: 'ie8'}))
+        .pipe(gulp.dest("dist/css"))
+        .pipe(browserSync.stream());
 });
 
-gulp.task('watch', function () {
-  gulp.watch("src/sass/**/*.+(scss|sass|css)", gulp.parallel('styles')) // Отслеживаем изменения в этом файле, после чего, запускаем таск 'styles'
-  // gulp.watch("src/*.html", gulp.parallel('styles')) // Отслеживаем изменения в этом файле, после чего, обновляем страницу
-  gulp.watch("src/*+.html").on('change', gulp.parallel('html')); // При изменении файла в папке scr, запускается задача HTML
+gulp.task('watch', function() {
+    gulp.watch("src/sass/**/*.+(scss|sass|css)", gulp.parallel('styles'));
+    gulp.watch("src/*.html").on('change', gulp.parallel('html'));
+    gulp.watch("src/js/**/*.js").on('change', gulp.parallel('scripts'));
+    gulp.watch("src/fonts/**/*").on('all', gulp.parallel('fonts'));
+    gulp.watch("src/icons/**/*").on('all', gulp.parallel('icons'));
+    gulp.watch("src/img/**/*").on('all', gulp.parallel('images'));
 });
 
-gulp.task('html', () => {
-  return gulp.src("src/*.html")  // Получаем измен файл
-    .pipe(htmlmin({collapseWhitespace: true}))  // Применяем плагин htmlmin
-    .pipe(gulp.dest("dist/"))  // После, полученный и обработанный файл кладём в папку dist
+gulp.task('html', function () {
+    return gulp.src("src/*.html")
+        .pipe(htmlmin({ collapseWhitespace: true }))
+        .pipe(gulp.dest("dist/"));
 });
 
-gulp.task('scripts', () => {
-  return gulp.src("src/js/**/*.js")  // Получаем измен файл
-    .pipe(gulp.dest("dist/js"))  // После, полученный и обработанный файл кладём в папку dist
+gulp.task('scripts', function () {
+    return gulp.src("src/js/**/*.js")
+        .pipe(gulp.dest("dist/js"))
+        .pipe(browserSync.stream());
 });
 
-gulp.task('fonts', () => {
-  return gulp.src("src/js/fonts/*")  // Получаем измен файл
-    .pipe(gulp.dest("dist/fonts"))  // После, полученный и обработанный файл кладём в папку dist
+gulp.task('fonts', function () {
+    return gulp.src("src/fonts/**/*")
+        .pipe(gulp.dest("dist/fonts"))
+        .pipe(browserSync.stream());
 });
 
-gulp.task('icons', () => {
-  return gulp.src("src/icons/**/*")  // Получаем измен файл
-    .pipe(gulp.dest("dist/icons"))  // После, полученный и обработанный файл кладём в папку dist
+gulp.task('icons', function () {
+    return gulp.src("src/icons/**/*")
+        .pipe(gulp.dest("dist/icons"))
+        .pipe(browserSync.stream());
 });
 
-gulp.task('mailer', () => {
-  return gulp.src("src/mailer/**/*")  // Получаем измен файл
-    .pipe(gulp.dest("dist/mailer"))  // После, полученный и обработанный файл кладём в папку dist
+gulp.task('images', function () {
+    return gulp.src("src/img/**/*")
+        .pipe(imagemin())
+        .pipe(gulp.dest("dist/img"))
+        .pipe(browserSync.stream());
 });
 
-gulp.task('images', () => {
-  return gulp.src("src/img/**/*")  // Получаем измен файл
-    .pipe(imagemin())
-    .pipe(gulp.dest("dist/img"))  // После, полученный и обработанный файл кладём в папку dist
-});
-
-gulp.task('default', gulp.parallel('watch', 'server', 'styles', 'scripts', 'fonts', 'icons', 'mailer', 'images', 'html')); // Выполняется при команде gulp
+gulp.task('default', gulp.parallel('watch', 'server', 'styles', 'scripts', 'fonts', 'icons', 'html', 'images'));
