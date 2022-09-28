@@ -14,7 +14,7 @@
     display: block;
     width: 30px;
     height: 3px;
-    background: #151812;
+    background: $main-color;
   }
 
   span.long {
@@ -55,6 +55,13 @@
     top: 25px;
     right: 25px;
     cursor: pointer;
+    fill: black;
+    transition: all .2s;
+
+    &:hover {
+      fill: white;
+      transform: rotate(90deg);
+    }
   }
 
   &__list {
@@ -103,6 +110,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    transition: all .2s;
+    a {
+      &:hover {
+        fill: white;
+        transform: scale(1.2);
+      }
+    }
   }
 
   &__overlay {

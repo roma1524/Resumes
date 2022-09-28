@@ -34,6 +34,11 @@
   &__text, &__social {
     margin-top: 20px;
   }
+  &__social {
+    a {
+      text-decoration: none;
+    }
+  }
 
   &__link {
     margin-right: 25px;
