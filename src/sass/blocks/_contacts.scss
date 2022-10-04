@@ -42,6 +42,11 @@
 
   &__link {
     margin-right: 25px;
+    transition: all .2s;
+
+    &:hover {
+      fill: $main-color;
+    }
 
     img {
       max-width: 30px;
